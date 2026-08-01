@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <header class="header">
+            <div>
+                <h1>Weather Dashboard</h1>
+                <p>Check current weather conditions anywhere.</p>
+            </div>
+        </header>
+
+
+        <!-- Search Section -->
+        <section class="search-section">
+
+            <form id="weather-form" method="POST" action="/">
+
+                <input
+                    type="text"
+                    id="city-input"
+                    name="city"
+                    placeholder="Enter city name..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit">
+                    Search
+                </button>
+
+            </form>
+
+            <button
+                id="location-btn"
+                class="location-btn"
+                type="button">
+                📍 Use My Location
+            </button>
+
+        </section>
+
+
+        <!-- Error Message -->
+        {% if error %}
+
+        <div id="message" class="message error">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <!-- Current Weather -->
+        {% if weather %}
+
+        <section id="weather-section" class="weather-section">
+
+            <div class="weather-main-card">
+
+                <div class="weather-location">
+
+                    <h2 id="city-name">
+                        {{ weather["name"] }}, {{ weather["sys"]["country"] }}
+                    </h2>
+
+                    <p id="weather-description">
+                        {{ weather["weather"][0]["description"] | capitalize }}
+                    </p>
+
+                </div>
+
+
+                <div class="temperature">
+
+                    <span id="temperature">
+                        {{ weather["main"]["temp"] | round | int }}
+                    </span>°C
+
+                </div>
+
+
+                <div class="weather-icon">
+
+                    <img
+                        src="https://openweathermap.org/img/wn/{{ weather['weather'][0]['icon'] }}@2x.png"
+                        alt="{{ weather['weather'][0]['description'] }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Weather Details -->
+            <div class="weather-details">
+
+                <div class="weather-card">
+
+                    <span>🌡️</span>
+
+                    <h3>Feels Like</h3>
+
+                    <p id="feels-like">
+                        {{ weather["main"]["feels_like"] | round | int }}°C
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>💧</span>
+
+                    <h3>Humidity</h3>
+
+                    <p id="humidity">
+                        {{ weather["main"]["humidity"] }}%
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>💨</span>
+
+                    <h3>Wind Speed</h3>
+
+                    <p id="wind-speed">
+                        {{ (weather["wind"]["speed"] * 3.6) | round(1) }} km/h
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>👁️</span>
+
+                    <h3>Visibility</h3>
+
+                    <p id="visibility">
+                        {{ (weather["visibility"] / 1000) | round(1) }} km
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        {% else %}
+
+
+        <!-- Empty Weather State -->
+        <section id="weather-section" class="weather-section">
+
+            <div class="weather-main-card">
+
+                <div class="weather-location">
+
+                    <h2 id="city-name">
+                        Search for a city
+                    </h2>
+
+                    <p id="weather-description">
+                        Enter a city name to see current weather.
+                    </p>
+
+                </div>
+
+
+                <div class="temperature">
+
+                    <span id="temperature">
+                        --
+                    </span>°C
+
+                </div>
+
+
+                <div class="weather-icon">
+                    🌤️
+                </div>
+
+            </div>
+
+
+            <div class="weather-details">
+
+                <div class="weather-card">
+
+                    <span>🌡️</span>
+
+                    <h3>Feels Like</h3>
+
+                    <p id="feels-like">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>💧</span>
+
+                    <h3>Humidity</h3>
+
+                    <p id="humidity">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>💨</span>
+
+                    <h3>Wind Speed</h3>
+
+                    <p id="wind-speed">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <span>👁️</span>
+
+                    <h3>Visibility</h3>
+
+                    <p id="visibility">
+                        --
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- 5-Day Forecast -->
+        <section class="forecast-section">
+
+            <h2>5-Day Forecast</h2>
+
+            <div id="forecast-container" class="forecast-container">
+
+                {% if forecast_days %}
+
+                    {% for day in forecast_days %}
+
+                    <div class="forecast-card">
+
+                        <h3>
+                            {{ day["dt_txt"].split(" ")[0] }}
+                        </h3>
+
+
+                        <div class="forecast-icon">
+
+                            <img
+                                src="https://openweathermap.org/img/wn/{{ day['weather'][0]['icon'] }}@2x.png"
+                                alt="{{ day['weather'][0]['description'] }}"
+                            >
+
+                        </div>
+
+
+                        <p>
+                            {{ day["main"]["temp"] | round | int }}°C
+                        </p>
+
+
+                        <small>
+                            {{ day["weather"][0]["description"] | capitalize }}
+                        </small>
+
+                    </div>
+
+                    {% endfor %}
+
+
+                {% else %}
+
+                    <div class="forecast-card">
+
+                        <h3>Coming Soon</h3>
+
+                        <div class="forecast-icon">
+                            🌤️
+                        </div>
+
+                        <p>--°C</p>
+
+                        <small>
+                            Search for a city to see forecast
+                        </small>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- Footer -->
+        <footer>
+
+            <p>
+                Weather Dashboard • Built with Python & Flask
+            </p>
+
+        </footer>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

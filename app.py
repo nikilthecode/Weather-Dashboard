@@ -112,5 +112,77 @@ def home():
     )
 
 
+@app.route("/weather-by-location", methods=["POST"])
+def weather_by_location():
+    data = request.get_json()
+
+    if not data:
+        return {"error": "Location data is required."}, 400
+
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+
+    if latitude is None or longitude is None:
+        return {"error": "Latitude and longitude are required."}, 400
+
+    params = {
+        "lat": latitude,
+        "lon": longitude,
+        "appid": API_KEY,
+        "units": "metric"
+    }
+
+    try:
+        current_response = requests.get(
+            CURRENT_WEATHER_URL,
+            params=params,
+            timeout=10
+        )
+
+        forecast_response = requests.get(
+            FORECAST_URL,
+            params=params,
+            timeout=10
+        )
+
+        if current_response.status_code != 200:
+            return {
+                "error": "Could not retrieve current weather."
+            }, current_response.status_code
+
+        if forecast_response.status_code != 200:
+            return {
+                "error": "Could not retrieve weather forecast."
+            }, forecast_response.status_code
+
+        weather = current_response.json()
+        forecast = forecast_response.json()
+
+        forecast_days = []
+        selected_dates = set()
+
+        for item in forecast["list"]:
+            date = item["dt_txt"].split(" ")[0]
+
+            if date not in selected_dates:
+                forecast_days.append(item)
+                selected_dates.add(date)
+
+            if len(forecast_days) == 5:
+                break
+
+        return {
+            "weather": weather,
+            "forecast_days": forecast_days
+        }
+
+    except requests.RequestException as e:
+        print("Location weather connection error:", e)
+
+        return {
+            "error": "Could not connect to the weather service."
+        }, 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

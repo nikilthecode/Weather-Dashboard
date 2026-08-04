@@ -58,15 +58,28 @@ function handleLocationSuccess(position) {
             longitude: longitude
         })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
+        .then(response => {
+            return response.json().then(data => ({
+                ok: response.ok,
+                data: data
+            }));
+        })
+        .then(result => {
+            if (!result.ok) {
+                alert(
+                    result.data.error ||
+                    "Could not retrieve weather data."
+                );
                 return;
             }
 
-            updateWeatherDisplay(data.weather);
-            updateForecastDisplay(data.forecast_days);
+            if (result.data.error) {
+                alert(result.data.error);
+                return;
+            }
+
+            updateWeatherDisplay(result.data.weather);
+            updateForecastDisplay(result.data.forecast_days);
         })
         .catch(error => {
             console.error("Location weather error:", error);

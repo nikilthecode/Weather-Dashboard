@@ -49,11 +49,17 @@ body {
 
 #city-input {
     flex: 1;
+    min-width: 0;
     padding: 15px 18px;
     border: 1px solid #cbd5e1;
     border-radius: 10px 0 0 10px;
     font-size: 16px;
     outline: none;
+}
+
+#city-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 #weather-form button {
@@ -64,10 +70,16 @@ body {
     color: white;
     font-size: 16px;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 #weather-form button:hover {
     background: #1d4ed8;
+}
+
+#weather-form button:active,
+.location-btn:active {
+    transform: translateY(1px);
 }
 
 .location-btn {
@@ -77,6 +89,17 @@ body {
     background: #0f172a;
     color: white;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.location-btn:hover {
+    background: #1e293b;
+}
+
+.location-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .weather-section {
@@ -90,12 +113,18 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 25px;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.weather-location {
+    min-width: 0;
 }
 
 .weather-location h2 {
     font-size: 30px;
     margin-bottom: 8px;
+    overflow-wrap: anywhere;
 }
 
 .weather-location p {
@@ -106,10 +135,19 @@ body {
 .temperature {
     font-size: 55px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .weather-icon {
     font-size: 65px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.weather-icon img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
 
 .weather-details {
@@ -125,6 +163,13 @@ body {
     border-radius: 15px;
     text-align: center;
     box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.weather-card:hover,
+.forecast-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
 }
 
 .weather-card span {
@@ -162,6 +207,8 @@ body {
     padding: 20px;
     text-align: center;
     box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 0;
 }
 
 .forecast-card h3 {
@@ -174,6 +221,12 @@ body {
     margin-bottom: 10px;
 }
 
+.forecast-card img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
 .forecast-card p {
     font-size: 22px;
     font-weight: bold;
@@ -182,12 +235,25 @@ body {
 
 .forecast-card small {
     color: #64748b;
+    display: block;
+    overflow-wrap: anywhere;
 }
 
 .message {
     text-align: center;
     margin: 15px 0;
-    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 10px;
+}
+
+.message.error {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.message.loading {
+    color: #1d4ed8;
+    background: #dbeafe;
 }
 
 footer {
@@ -196,7 +262,7 @@ footer {
     color: #64748b;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
 
     .search-section {
         flex-direction: column;
@@ -215,6 +281,41 @@ footer {
     }
 
     .forecast-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+
+    .app-container {
+        width: 92%;
+        padding: 30px 0;
+    }
+
+    .header h1 {
+        font-size: 34px;
+    }
+
+    .header p {
+        font-size: 15px;
+    }
+
+    .weather-main-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 30px 20px;
+    }
+
+    .weather-location h2 {
+        font-size: 25px;
+    }
+
+    .temperature {
+        font-size: 48px;
+    }
+
+    .forecast-container {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -226,14 +327,31 @@ footer {
         padding: 25px 0;
     }
 
-    .header h1 {
-        font-size: 32px;
+    .header {
+        margin-bottom: 25px;
     }
 
-    .weather-main-card {
+    .header h1 {
+        font-size: 30px;
+    }
+
+    .search-section {
+        gap: 10px;
+    }
+
+    #weather-form {
         flex-direction: column;
-        text-align: center;
-        gap: 20px;
+        gap: 10px;
+    }
+
+    #city-input {
+        border-radius: 10px;
+        width: 100%;
+    }
+
+    #weather-form button {
+        border-radius: 10px;
+        width: 100%;
     }
 
     .weather-details {
@@ -242,5 +360,13 @@ footer {
 
     .forecast-container {
         grid-template-columns: 1fr;
+    }
+
+    .weather-card {
+        padding: 20px;
+    }
+
+    footer {
+        font-size: 14px;
     }
 }

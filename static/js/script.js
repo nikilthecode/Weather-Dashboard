@@ -1,3 +1,26 @@
+
+const weatherForm = document.getElementById("weather-form");
+const loadingMessage = document.getElementById("loading-message");
+
+function showLoading() {
+    if (loadingMessage) {
+        loadingMessage.hidden = false;
+    }
+}
+
+function hideLoading() {
+    if (loadingMessage) {
+        loadingMessage.hidden = true;
+    }
+}
+
+if (weatherForm) {
+    weatherForm.addEventListener("submit", function () {
+        showLoading();
+    });
+}
+
+
 const locationButton = document.getElementById("location-btn");
 
 
@@ -6,6 +29,8 @@ locationButton.addEventListener("click", function () {
         alert("Geolocation is not supported by your browser.");
         return;
     }
+
+    showLoading();
 
     locationButton.textContent = "📍 Getting Location...";
     locationButton.disabled = true;
@@ -46,6 +71,8 @@ function handleLocationSuccess(position) {
             alert("Could not retrieve weather for your location.");
         })
         .finally(() => {
+            hideLoading();
+
             locationButton.textContent = "📍 Use My Location";
             locationButton.disabled = false;
         });
@@ -64,6 +91,8 @@ function handleLocationError(error) {
     }
 
     alert(message);
+
+    hideLoading();
 
     locationButton.textContent = "📍 Use My Location";
     locationButton.disabled = false;

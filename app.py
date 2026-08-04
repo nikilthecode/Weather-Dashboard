@@ -58,7 +58,6 @@ def home():
                     if forecast_response.status_code == 200:
                         forecast = forecast_response.json()
 
-                        # Select one forecast entry for each day
                         selected_dates = set()
 
                         for item in forecast["list"]:
@@ -77,11 +76,21 @@ def home():
                             forecast_response.status_code
                         )
 
+                        if forecast_response.status_code == 401:
+                            error = "Weather API authentication failed."
+                        elif forecast_response.status_code >= 500:
+                            error = "Weather service is temporarily unavailable."
+                        else:
+                            error = "Could not retrieve the weather forecast."
+
                 elif current_response.status_code == 404:
                     error = "City not found. Please check the city name."
 
                 elif current_response.status_code == 401:
                     error = "Weather API authentication failed."
+
+                elif current_response.status_code >= 500:
+                    error = "Weather service is temporarily unavailable."
 
                 else:
                     print(
@@ -94,14 +103,19 @@ def home():
                         current_response.text
                     )
 
-                    error = (
-                        f"Weather service error: "
-                        f"{current_response.status_code}"
-                    )
+                    error = "Unable to retrieve weather information."
+
+            except requests.Timeout:
+                print("Weather request timed out.")
+                error = "The weather service took too long to respond."
+
+            except requests.ConnectionError:
+                print("Could not connect to the weather service.")
+                error = "Could not connect to the weather service."
 
             except requests.RequestException as e:
-                print("Connection error:", e)
-                error = "Could not connect to the weather service."
+                print("Weather request error:", e)
+                error = "Something went wrong while retrieving weather data."
 
     return render_template(
         "index.html",
@@ -125,6 +139,25 @@ def weather_by_location():
     if latitude is None or longitude is None:
         return {"error": "Latitude and longitude are required."}, 400
 
+    try:
+        latitude = float(latitude)
+        longitude = float(longitude)
+
+    except (TypeError, ValueError):
+        return {
+            "error": "Invalid location coordinates."
+        }, 400
+
+    if not (-90 <= latitude <= 90):
+        return {
+            "error": "Invalid latitude value."
+        }, 400
+
+    if not (-180 <= longitude <= 180):
+        return {
+            "error": "Invalid longitude value."
+        }, 400
+
     params = {
         "lat": latitude,
         "lon": longitude,
@@ -145,10 +178,20 @@ def weather_by_location():
             timeout=10
         )
 
+        if current_response.status_code == 401:
+            return {
+                "error": "Weather API authentication failed."
+            }, 401
+
         if current_response.status_code != 200:
             return {
                 "error": "Could not retrieve current weather."
             }, current_response.status_code
+
+        if forecast_response.status_code == 401:
+            return {
+                "error": "Weather API authentication failed."
+            }, 401
 
         if forecast_response.status_code != 200:
             return {
@@ -176,11 +219,25 @@ def weather_by_location():
             "forecast_days": forecast_days
         }
 
-    except requests.RequestException as e:
-        print("Location weather connection error:", e)
+    except requests.Timeout:
+        print("Location weather request timed out.")
+
+        return {
+            "error": "The weather service took too long to respond."
+        }, 504
+
+    except requests.ConnectionError:
+        print("Location weather connection failed.")
 
         return {
             "error": "Could not connect to the weather service."
+        }, 503
+
+    except requests.RequestException as e:
+        print("Location weather request error:", e)
+
+        return {
+            "error": "Something went wrong while retrieving weather data."
         }, 500
 
 

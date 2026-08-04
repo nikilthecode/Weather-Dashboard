@@ -24,22 +24,24 @@ if (weatherForm) {
 const locationButton = document.getElementById("location-btn");
 
 
-locationButton.addEventListener("click", function () {
-    if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
-        return;
-    }
+if (locationButton) {
+    locationButton.addEventListener("click", function () {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+        }
 
-    showLoading();
+        showLoading();
 
-    locationButton.textContent = "📍 Getting Location...";
-    locationButton.disabled = true;
+        locationButton.textContent = "📍 Getting Location...";
+        locationButton.disabled = true;
 
-    navigator.geolocation.getCurrentPosition(
-        handleLocationSuccess,
-        handleLocationError
-    );
-});
+        navigator.geolocation.getCurrentPosition(
+            handleLocationSuccess,
+            handleLocationError
+        );
+    });
+}
 
 
 function handleLocationSuccess(position) {

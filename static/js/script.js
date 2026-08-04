@@ -157,7 +157,31 @@ function updateForecastDisplay(forecastDays) {
     const forecastContainer =
         document.getElementById("forecast-container");
 
+    if (!forecastContainer) {
+        return;
+    }
+
     forecastContainer.innerHTML = "";
+
+    if (!Array.isArray(forecastDays) || forecastDays.length === 0) {
+        forecastContainer.innerHTML = `
+            <div class="forecast-card">
+                <h3>Forecast Unavailable</h3>
+
+                <div class="forecast-icon">
+                    🌤️
+                </div>
+
+                <p>--°C</p>
+
+                <small>
+                    Forecast data is currently unavailable.
+                </small>
+            </div>
+        `;
+
+        return;
+    }
 
     forecastDays.forEach(item => {
         const date = new Date(item.dt_txt);
